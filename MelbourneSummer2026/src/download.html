@@ -1,0 +1,13 @@
+<html>
+  <body>
+    <a
+      id="d"
+      download="h2h_results_<?= competitionId?>.csv"
+      href="data:text/csv;charset=utf-8,<?= encodeURIComponent(csv) ?>"
+    ></a>
+    <script>
+      document.getElementById("d").click();
+      google.script.host.close();
+    </script>
+  </body>
+</html>

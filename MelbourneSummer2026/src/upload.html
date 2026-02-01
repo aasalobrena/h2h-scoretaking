@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+  <head>
+    <style>
+      #loader {
+        display: none;
+        margin-top: 15px;
+        font-weight: bold;
+      }
+      .spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 3px solid #ccc;
+        border-top: 3px solid #4285f4;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        vertical-align: middle;
+        margin-right: 8px;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <input type="file" id="file" accept=".json" />
+    <br /><br />
+    <button id="btn" onclick="downloadCSV()">Download results CSV</button>
+    <div id="loader">
+      <span class="spinner"></span>
+    </div>
+    <script>
+      const downloadCSV = () => {
+        const fileInput = document.getElementById("file");
+        const file = fileInput.files[0];
+        if (!file) {
+          alert("Please select a valid scrambles JSON");
+          return;
+        }
+        document.getElementById("loader").style.display = "block";
+        document.getElementById("btn").disabled = true;
+        const reader = new FileReader();
+        reader.onload = () => {
+          google.script.run
+            .withSuccessHandler(() => {
+              google.script.host.close();
+            })
+            .withFailureHandler((err) => {
+              alert("Error: " + err.message);
+              document.getElementById("loader").style.display = "none";
+              document.getElementById("btn").disabled = false;
+            })
+            .downloadCSV(reader.result);
+        };
+        reader.readAsText(file);
+      };
+    </script>
+  </body>
+</html>
