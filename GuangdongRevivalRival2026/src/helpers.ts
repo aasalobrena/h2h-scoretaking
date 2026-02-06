@@ -16,6 +16,13 @@ const getBest = (resultRows: ResultRow[]) =>
     .sort((a, b) => a - b)
     .at(0) || Infinity;
 
+const getWcif = () =>
+  JSON.parse(
+    UrlFetchApp.fetch(
+      `https://www.worldcubeassociation.org/api/v0/competitions/${COMPETITION_ID}/wcif/public/`,
+    ).getContentText(),
+  ) as Competition;
+
 const getPoints = (resultRows: [ResultRow, ResultRow]) => {
   const points = [0, 0];
   for (let i = 3; i <= 9; i++) {

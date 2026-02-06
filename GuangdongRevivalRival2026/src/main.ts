@@ -1,49 +1,8 @@
-const onOpen = () => {
-  const dashboard = SpreadsheetApp.getUi().createMenu("Dashboard");
-  EVENT_IDS.forEach((eventId) =>
-    dashboard
-      .addItem(`Set ${eventId} competitors`, `setCompetitors${eventId}`)
-      .addToUi(),
-  );
-  dashboard.addItem("Scrambles matcher", "scramblesMatcher").addToUi();
-};
-
-const setCompetitors = (eventId: SupportedEventId) => {
-  try {
-    const res = UrlFetchApp.fetch(
-      `https://www.worldcubeassociation.org/api/v0/competitions/${COMPETITION_ID}/wcif/public/`,
-    );
-    const wcif = JSON.parse(res.getContentText()) as Competition;
-    const competitorRows = wcif.events
-      .find((event) => event.id === eventId)!
-      .rounds.at(-2)!
-      .results.filter(
-        (result) => result.ranking && result.ranking <= N_COMPETITORS[eventId],
-      )
-      .sort((a, b) => a.ranking! - b.ranking!)
-      .map((result) => {
-        const person = wcif.persons.find(
-          (person) => person.registrantId === result.personId,
-        )!;
-        return [
-          person.registrantId,
-          person.name,
-          person.registration!.wcaRegistrationId,
-        ];
-      });
-    SpreadsheetApp.getActive()
-      .getSheetByName(`${eventId} Competitors`)!
-      .getRange(2, 1, competitorRows.length, 3)
-      .setValues(competitorRows);
-  } catch (err) {
-    showError(err as string);
-  }
-};
-
-///////////////////////////////////////////////////
-const setCompetitors333 = () => setCompetitors("333");
-const setCompetitors444 = () => setCompetitors("444");
-///////////////////////////////////////////////////
+const onOpen = () =>
+  SpreadsheetApp.getUi()
+    .createMenu("Dashboard")
+    .addItem("Scrambles matcher", "scramblesMatcher")
+    .addToUi();
 
 const scramblesMatcher = () => {
   try {
@@ -60,7 +19,8 @@ const scramblesMatcher = () => {
       files.hasNext() &&
       !file.getName().toLowerCase().endsWith(".json")
     );
-    const values: string[][] = [
+    const wcif = getWcif();
+    const values: (string | number)[][] = [
       [
         "round_id",
         "match_number",
@@ -84,8 +44,18 @@ const scramblesMatcher = () => {
       const ss = SpreadsheetApp.getActive();
       const competitorRows = ss
         .getSheetByName(`${eventId} Competitors`)!
-        .getRange(2, 1, N_COMPETITORS[eventId], 3)
+        .getRange(2, 1, N_COMPETITORS[eventId], 2)
         .getValues();
+      const registrationIds = wcif.persons
+        .filter((person) =>
+          competitorRows
+            .map((competitorRow) => competitorRow[0] as RegistrantId)
+            .includes(person.registrantId),
+        )
+        .map((person) => [
+          person.registrantId,
+          person.registration!.wcaRegistrationId,
+        ]) as [RegistrantId, number][];
       const resultsSheet = ss.getSheetByName(`${eventId} Results`)!;
       const resultRows = resultsSheet
         .getRange(2, 1, resultsSheet.getLastRow() - 1, 10)
@@ -168,6 +138,9 @@ const scramblesMatcher = () => {
           ///////////////////////////////////////////////////
         }
         const scrambleSet = scrambleSets[Math.floor(rowIndex / 2)];
+        const wcaRegistrationId = registrationIds.find(
+          (registrationId) => registrationId[0] === (row[2] as RegistrantId),
+        )![1];
         for (let i = 0; i < 7; i++) {
           if (row[i + 3]) {
             const isExtra = i >= 5;
@@ -177,9 +150,7 @@ const scramblesMatcher = () => {
               row[0],
               row[1],
               i + 1,
-              competitorRows
-                .find((competitorRow) => competitorRow[0] === row[2])!
-                .at(2),
+              wcaRegistrationId,
               ranking,
               row[i + 3] < 0 ? row[i + 3] : row[i + 3] / 100,
               isExtra
