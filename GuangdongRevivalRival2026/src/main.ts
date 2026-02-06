@@ -91,7 +91,14 @@ const scramblesMatcher = () => {
                 const lastMatchNumber = resultRows
                   .filter((resultRow) => resultRow[2] === competitorRow[0])
                   .at(-1)![0];
-                return lastMatchNumber >= 5 && lastMatchNumber <= 8;
+                return (
+                  (eventId === "333" &&
+                    lastMatchNumber >= 9 &&
+                    lastMatchNumber <= 12) ||
+                  (eventId === "444" &&
+                    lastMatchNumber >= 1 &&
+                    lastMatchNumber <= 4)
+                );
               })
               .map(
                 (competitorRow) =>
@@ -117,7 +124,7 @@ const scramblesMatcher = () => {
                 (competitorRow) =>
                   resultRows
                     .filter((resultRow) => resultRow[2] === competitorRow[0])
-                    .at(-1)![0] <= 4,
+                    .at(-1)![0] <= 8,
               )
               .map(
                 (competitorRow) =>
