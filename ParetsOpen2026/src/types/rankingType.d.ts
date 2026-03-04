@@ -1,0 +1,1 @@
+type RankingType = "single" | "average";
