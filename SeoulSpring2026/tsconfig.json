@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "None",
+    "rootDir": "src",
+    "outDir": "dist",
+    "strict": true,
+    "types": ["google-apps-script"],
+    "lib": ["ES2022"],
+    "noImplicitAny": false
+  }
+}
