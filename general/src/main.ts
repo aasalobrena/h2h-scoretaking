@@ -184,7 +184,7 @@ const setCompetitors = (eventId: SupportedEventId) => {
     );
     if (!competitorsSheet)
       throw new Error(`Sheet \'${eventId} Competitors\' does not exist.`);
-    const nCompetitors = competitorsSheet.getMaxRows();
+    const nCompetitors = competitorsSheet.getMaxRows() - 1;
     const wcif = getWcif();
     const competitorRows = wcif.events
       .find((event) => event.id === eventId)!
