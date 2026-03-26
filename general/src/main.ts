@@ -47,7 +47,7 @@ const scramblesMatcher = () => {
       const scrambleSets = (
         JSON.parse(file.getBlob().getDataAsString()).wcif as Competition
       ).events
-        .find((event) => event.id === eventId)!
+        .find((event) => event.id == eventId)!
         .rounds.flatMap((round) => round.scrambleSets!);
       const competitorsSheet = ss.getSheetByName(`${eventId} Competitors`)!;
       const nCompetitors = competitorsSheet.getLastRow() - 1;
