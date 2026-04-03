@@ -141,7 +141,8 @@ const scramblesMatcher = () => {
               ).length + 9;
             break;
         }
-        const scrambleSet = scrambleSets[Math.floor(rowIndex / 2)];
+        const scrambleSetNumber = Math.floor(rowIndex / 2) + 1;
+        const scrambleSet = scrambleSets[scrambleSetNumber - 1];
         const wcaRegistrationId = registrationIds.find(
           (registrationId) => registrationId[0] === (row[2] as RegistrantId),
         )![1];
@@ -160,7 +161,7 @@ const scramblesMatcher = () => {
               isExtra
                 ? scrambleSet.extraScrambles[scrambleIndex]
                 : scrambleSet.scrambles[scrambleIndex],
-              scrambleSet.id,
+              scrambleSetNumber,
               scrambleIndex + 1,
               Number(isExtra),
             ]);
